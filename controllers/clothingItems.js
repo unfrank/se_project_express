@@ -7,7 +7,7 @@ const {
 
 module.exports.getClothingItems = (req, res) => {
   ClothingItem.find({})
-    .then((items) => res.status(200).send(items))
+    .then((items) => res.send(items))
     .catch(() =>
       res
         .status(INTERNAL_SERVER_ERROR)
@@ -24,7 +24,7 @@ module.exports.getClothingItem = (req, res) => {
       error.statusCode = NOT_FOUND;
       throw error;
     })
-    .then((item) => res.status(200).send(item))
+    .then((item) => res.send(item))
     .catch((err) => {
       if (err.name === "CastError") {
         return res.status(BAD_REQUEST).send({ message: "Invalid ID format" });
@@ -44,38 +44,26 @@ module.exports.createClothingItem = (req, res) => {
 
   ClothingItem.create({ name, weather, imageUrl, owner })
     .then((item) => res.status(201).send(item))
-    .catch(() => res.status(BAD_REQUEST).send({ message: "Invalid data" }));
-};
-
-module.exports.updateClothingItem = (req, res) => {
-  const { itemId } = req.params;
-  const updateData = req.body;
-
-  return ClothingItem.findByIdAndUpdate(itemId, updateData, {
-    new: true,
-    runValidators: true,
-  })
-    .then((updatedItem) => {
-      if (!updatedItem) {
-        return res.status(NOT_FOUND).send({ message: "Item not found" });
+    .catch((err) => {
+      if (err.name === "ValidationError") {
+        return res.status(BAD_REQUEST).send({ message: "Invalid data" });
       }
-      return res.status(200).send(updatedItem);
-    })
-    .catch(() =>
-      res.status(BAD_REQUEST).send({ message: "Invalid update request" })
-    );
+      return res
+        .status(INTERNAL_SERVER_ERROR)
+        .send({ message: "An error has occurred on the server" });
+    });
 };
 
 module.exports.deleteClothingItem = (req, res) => {
   const { itemId } = req.params;
 
-  return ClothingItem.findByIdAndDelete(itemId)
+  ClothingItem.findByIdAndDelete(itemId)
     .orFail(() => {
       const error = new Error("Item not found");
       error.statusCode = NOT_FOUND;
       throw error;
     })
-    .then(() => res.status(200).send({ message: "Item deleted" }))
+    .then(() => res.send({ message: "Item deleted" }))
     .catch((err) => {
       if (err.name === "CastError") {
         return res
@@ -94,7 +82,7 @@ module.exports.deleteClothingItem = (req, res) => {
 module.exports.likeItem = (req, res) => {
   const { itemId } = req.params;
 
-  return ClothingItem.findByIdAndUpdate(
+  ClothingItem.findByIdAndUpdate(
     itemId,
     { $addToSet: { likes: req.user._id } },
     { new: true, runValidators: true }
@@ -104,7 +92,7 @@ module.exports.likeItem = (req, res) => {
       error.statusCode = NOT_FOUND;
       throw error;
     })
-    .then((updatedItem) => res.status(200).send(updatedItem))
+    .then((updatedItem) => res.send(updatedItem))
     .catch((err) => {
       if (err.name === "CastError") {
         return res
@@ -123,7 +111,7 @@ module.exports.likeItem = (req, res) => {
 module.exports.dislikeItem = (req, res) => {
   const { itemId } = req.params;
 
-  return ClothingItem.findByIdAndUpdate(
+  ClothingItem.findByIdAndUpdate(
     itemId,
     { $pull: { likes: req.user._id } },
     { new: true, runValidators: true }
@@ -133,7 +121,7 @@ module.exports.dislikeItem = (req, res) => {
       error.statusCode = NOT_FOUND;
       throw error;
     })
-    .then((updatedItem) => res.status(200).send(updatedItem))
+    .then((updatedItem) => res.send(updatedItem))
     .catch((err) => {
       if (err.name === "CastError") {
         return res

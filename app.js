@@ -22,10 +22,6 @@ app.use((req, res, next) => {
 
 app.use("/", routes);
 
-app.get("/", (req, res) => {
-  res.send({ message: "Welcome to the WTWR API!" });
-});
-
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });
