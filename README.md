@@ -1,9 +1,38 @@
-# WTWR (What to Wear?): Back End
-The back-end project is focused on creating a server for the WTWR application. You’ll gain a deeper understanding of how to work with databases, set up security and testing, and deploy web applications on a remote machine. The eventual goal is to create a server with an API and user authorization.
-## Running the Project
-`npm run start` — to launch the server 
+# WTWR (What to Wear?) - Back End
 
-`npm run dev` — to launch the server with the hot reload feature
+## Description
 
-### Testing
-Before committing your code, make sure you edit the file `sprint.txt` in the root folder. The file `sprint.txt` should contain the number of the sprint you're currently working on. For ex. 12
+The WTWR backend is a Node.js and Express-based server. This application allows users to like clothing items. The backend connects to a MongoDB database to store and retrieve user and clothing item data.
+
+## Features
+
+- RESTful API for managing clothing items and users
+- CRUD operations for clothing items
+- MongoDB integration using Mongoose
+- Error handling
+
+## Technologies Used
+
+- **Node.js** - JavaScript runtime environment
+- **Express.js** - Web framework for building RESTful APIs
+- **MongoDB** - NoSQL database for storing user and clothing data
+- **Mongoose** - ODM (Object Data Modeling) for MongoDB
+- **ESLint & Prettier** - Code formatting and linting
+- **GitHub Actions** - CI/CD for automated testing
+
+## API Endpoints
+
+### User
+
+- `GET /users` - Get all users
+- `GET /users/:userId` - Get a specific user
+- `POST /users` - Create a new user
+
+### Clothing Items
+
+- `GET /items` - Get all clothing items
+- `GET /items/:itemId` - Get a specific clothing item
+- `POST /items` - Create a new clothing item
+- `DELETE /items/:itemId` - Delete a clothing item
+- `PUT /items/:itemId/likes` - Like a clothing item
+- `DELETE /items/:itemId/likes` - Unlike a clothing item
