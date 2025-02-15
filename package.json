@@ -13,6 +13,7 @@
   "author": "James Unthank",
   "license": "ISC",
   "dependencies": {
+    "bcryptjs": "^3.0.0",
     "express": "^4.21.2",
     "mongoose": "^8.9.5",
     "validator": "^13.12.0"
