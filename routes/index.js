@@ -9,11 +9,8 @@ const router = express.Router();
 router.post("/signup", createUser);
 router.post("/signin", login);
 
-router.use("/items", clothingItemsRouter);
-
-router.use(auth);
-router.use("/users", usersRouter);
 router.use("/items", auth, clothingItemsRouter);
+router.use("/users", auth, usersRouter);
 
 router.use((req, res) => {
   res.status(404).send({ message: "Requested resource not found" });

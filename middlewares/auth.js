@@ -14,7 +14,6 @@ module.exports = (req, res, next) => {
   try {
     const payload = jwt.verify(jwtToken, JWT_SECRET);
     req.user = payload;
-    console.log("Decoded JWT payload:", req.user);
     next();
   } catch (err) {
     return res.status(UNAUTHORIZED).send({ message: "Invalid token" });
