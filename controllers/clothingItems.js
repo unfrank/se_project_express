@@ -40,7 +40,7 @@ module.exports.getClothingItem = (req, res) => {
 
 module.exports.createClothingItem = (req, res) => {
   const { name, weather, imageUrl } = req.body;
-  const owner = req.user?._id || "650ffb6de59b1c001b47c9f2"; // Default owner
+  const owner = req.user?._id || "650ffb6de59b1c001b47c9f2";
 
   ClothingItem.create({ name, weather, imageUrl, owner })
     .then((item) => res.status(201).send(item))
