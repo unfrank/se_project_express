@@ -1,33 +1,36 @@
+const validator = require("validator");
+const mongoose = require("mongoose");
 const ClothingItem = require("../models/clothingItem");
 const {
   BAD_REQUEST,
   NOT_FOUND,
   INTERNAL_SERVER_ERROR,
-  CONFLICT,
 } = require("../utils/errors");
-const validator = require("validator");
-const mongoose = require("mongoose");
 
 module.exports.getClothingItems = (req, res) => {
-  ClothingItem.find({})
-    .then((items) => res.send(items))
-    .catch(() =>
-      res
+  return ClothingItem.find({})
+    .then((items) => {
+      return res.send(items);
+    })
+    .catch(() => {
+      return res
         .status(INTERNAL_SERVER_ERROR)
-        .send({ message: "An error has occurred on the server" })
-    );
+        .send({ message: "An error has occurred on the server" });
+    });
 };
 
 module.exports.getClothingItem = (req, res) => {
   const { itemId } = req.params;
 
-  ClothingItem.findById(itemId)
+  return ClothingItem.findById(itemId)
     .orFail(() => {
       const error = new Error("Item not found");
       error.statusCode = NOT_FOUND;
       throw error;
     })
-    .then((item) => res.send(item))
+    .then((item) => {
+      return res.send(item);
+    })
     .catch((err) => {
       if (err.name === "CastError") {
         return res.status(BAD_REQUEST).send({ message: "Invalid ID format" });
@@ -61,14 +64,16 @@ module.exports.createClothingItem = (req, res) => {
       .send({ message: "Invalid image URL format" });
   }
 
-  ClothingItem.create({ name, weather, imageUrl, owner })
-    .then((item) => res.status(201).send(item))
+  return ClothingItem.create({ name, weather, imageUrl, owner })
+    .then((item) => {
+      return res.status(201).send(item);
+    })
     .catch((err) => {
-      console.error("❌ Error creating item:", err);
+      console.error("Error creating item:", err);
       if (err.name === "ValidationError") {
         return res.status(BAD_REQUEST).send({ message: "Invalid data" });
       }
-      res
+      return res
         .status(INTERNAL_SERVER_ERROR)
         .send({ message: "An error has occurred on the server" });
     });
@@ -77,7 +82,7 @@ module.exports.createClothingItem = (req, res) => {
 module.exports.deleteClothingItem = (req, res) => {
   const { itemId } = req.params;
 
-  ClothingItem.findById(itemId)
+  return ClothingItem.findById(itemId)
     .orFail(() => {
       throw Object.assign(new Error("Item not found"), {
         statusCode: NOT_FOUND,
@@ -96,7 +101,7 @@ module.exports.deleteClothingItem = (req, res) => {
       if (!deletedItem) {
         return res.status(NOT_FOUND).send({ message: "Item not found" });
       }
-      res.status(200).send({ message: "Item deleted successfully" });
+      return res.status(200).send({ message: "Item deleted successfully" });
     })
     .catch((err) => {
       if (err.statusCode === NOT_FOUND) {
@@ -120,7 +125,7 @@ module.exports.likeItem = (req, res) => {
     return res.status(BAD_REQUEST).send({ message: "Invalid item ID format" });
   }
 
-  ClothingItem.findByIdAndUpdate(
+  return ClothingItem.findByIdAndUpdate(
     itemId,
     { $addToSet: { likes: req.user._id } },
     { new: true, runValidators: true }
@@ -134,7 +139,7 @@ module.exports.likeItem = (req, res) => {
       if (!updatedItem) {
         return res.status(NOT_FOUND).send({ message: "Item not found" });
       }
-      res.send(updatedItem);
+      return res.send(updatedItem);
     })
     .catch((err) => {
       console.error("Error liking item:", err);
@@ -159,7 +164,7 @@ module.exports.dislikeItem = (req, res) => {
     return res.status(BAD_REQUEST).send({ message: "Invalid item ID format" });
   }
 
-  ClothingItem.findByIdAndUpdate(
+  return ClothingItem.findByIdAndUpdate(
     itemId,
     { $pull: { likes: req.user._id } },
     { new: true, runValidators: true }
@@ -173,7 +178,7 @@ module.exports.dislikeItem = (req, res) => {
       if (!updatedItem) {
         return res.status(NOT_FOUND).send({ message: "Item not found" });
       }
-      res.send(updatedItem);
+      return res.send(updatedItem);
     })
     .catch((err) => {
       console.error("Error unliking item:", err);

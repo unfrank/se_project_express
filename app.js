@@ -1,7 +1,7 @@
+const cors = require("cors");
 const express = require("express");
 const mongoose = require("mongoose");
 const routes = require("./routes");
-const cors = require("cors");
 require("dotenv").config();
 
 const { PORT = 3001 } = process.env;
@@ -9,7 +9,6 @@ const app = express();
 
 app.use((req, res, next) => {
   console.log(`Incoming request: ${req.method} ${req.url}`);
-  next();
 });
 
 mongoose
