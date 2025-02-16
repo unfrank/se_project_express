@@ -4,6 +4,8 @@ const mongoose = require("mongoose");
 const routes = require("./routes");
 require("dotenv").config();
 
+const { INTERNAL_SERVER_ERROR } = require("./utils/errors");
+
 const { PORT = 3001 } = process.env;
 const app = express();
 
@@ -18,7 +20,9 @@ app.use(express.json());
 app.use("/", routes);
 
 app.use((err, req, res) => {
-  res.status(500).send({ message: "An internal server error occurred" });
+  res
+    .status(INTERNAL_SERVER_ERROR)
+    .send({ message: "An internal server error occurred" });
 });
 
 app.listen(PORT, () => {});

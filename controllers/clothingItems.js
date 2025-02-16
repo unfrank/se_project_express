@@ -4,6 +4,7 @@ const ClothingItem = require("../models/clothingItem");
 const {
   BAD_REQUEST,
   NOT_FOUND,
+  FORBIDDEN,
   INTERNAL_SERVER_ERROR,
 } = require("../utils/errors");
 
@@ -47,12 +48,6 @@ module.exports.createClothingItem = (req, res) => {
     return res.status(BAD_REQUEST).send({ message: "All fields are required" });
   }
 
-  if (typeof name !== "string" || name.length < 2 || name.length > 30) {
-    return res
-      .status(BAD_REQUEST)
-      .send({ message: "Name must be a string between 2 and 30 characters" });
-  }
-
   if (!validator.isURL(imageUrl)) {
     return res
       .status(BAD_REQUEST)
@@ -76,23 +71,23 @@ module.exports.deleteClothingItem = (req, res) => {
 
   return ClothingItem.findById(itemId)
     .orFail(() => {
-      throw Object.assign(new Error("Item not found"), {
-        statusCode: NOT_FOUND,
-      });
+      throw { statusCode: NOT_FOUND, message: "Item not found" };
     })
     .then((item) => {
       if (!item.owner.equals(req.user._id)) {
-        return res
-          .status(403)
-          .send({ message: "You are not authorized to delete this item" });
+        throw {
+          statusCode: FORBIDDEN,
+          message: "You are not authorized to delete this item",
+        };
       }
-
       return ClothingItem.findByIdAndDelete(itemId);
     })
     .then(() => res.status(200).send({ message: "Item deleted successfully" }))
     .catch((err) => {
-      if (err.statusCode === NOT_FOUND) {
-        return res.status(NOT_FOUND).send({ message: err.message });
+      if (res.headersSent) return;
+
+      if (err.statusCode) {
+        return res.status(err.statusCode).send({ message: err.message });
       }
       if (err.name === "CastError") {
         return res

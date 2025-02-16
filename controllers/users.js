@@ -17,12 +17,6 @@ module.exports.createUser = (req, res) => {
     return res.status(BAD_REQUEST).send({ message: "All fields are required" });
   }
 
-  if (name.length < 2 || name.length > 30) {
-    return res
-      .status(BAD_REQUEST)
-      .send({ message: "Name must be between 2 and 30 characters" });
-  }
-
   if (!validator.isURL(avatar)) {
     return res
       .status(BAD_REQUEST)
@@ -107,12 +101,6 @@ module.exports.login = (req, res) => {
 };
 
 module.exports.getCurrentUser = (req, res) => {
-  if (!req.user || !req.user._id) {
-    return res
-      .status(UNAUTHORIZED)
-      .send({ message: "Unauthorized: User not found" });
-  }
-
   return User.findById(req.user._id)
     .orFail(() => {
       throw new Error("User not found");
@@ -126,6 +114,9 @@ module.exports.getCurrentUser = (req, res) => {
       })
     )
     .catch((err) => {
+      if (err.message === "User not found") {
+        return res.status(NOT_FOUND).send({ message: "User not found" });
+      }
       if (err.name === "CastError") {
         return res.status(BAD_REQUEST).send({ message: "Invalid ID format" });
       }
@@ -160,6 +151,9 @@ module.exports.updateUser = (req, res) => {
       })
     )
     .catch((err) => {
+      if (err.message === "User not found") {
+        return res.status(NOT_FOUND).send({ message: "User not found" });
+      }
       if (err.name === "ValidationError") {
         return res.status(BAD_REQUEST).send({ message: "Invalid user data" });
       }
