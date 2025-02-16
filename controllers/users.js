@@ -1,17 +1,14 @@
+const validator = require("validator");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const User = require("../models/user");
-
 const {
   BAD_REQUEST,
-  NOT_FOUND,
-  INTERNAL_SERVER_ERROR,
   UNAUTHORIZED,
+  INTERNAL_SERVER_ERROR,
   CONFLICT,
 } = require("../utils/errors");
-
 const { JWT_SECRET } = require("../utils/config");
-const validator = require("validator");
 
 module.exports.createUser = (req, res) => {
   const { name, avatar, email, password } = req.body;
@@ -36,7 +33,7 @@ module.exports.createUser = (req, res) => {
     return res.status(BAD_REQUEST).send({ message: "Invalid email format" });
   }
 
-  bcrypt
+  return bcrypt
     .hash(password, 10)
     .then((hashedPassword) =>
       User.create({ name, avatar, email, password: hashedPassword })
@@ -58,15 +55,13 @@ module.exports.createUser = (req, res) => {
 
       if (err.name === "ValidationError") {
         return res.status(BAD_REQUEST).send({
-          message:
-            "Invalid user data: " +
-            Object.values(err.errors)
-              .map((e) => e.message)
-              .join(", "),
+          message: `Invalid user data: ${Object.values(err.errors)
+            .map((e) => e.message)
+            .join(", ")}`,
         });
       }
 
-      res
+      return res
         .status(INTERNAL_SERVER_ERROR)
         .send({ message: "An error has occurred on the server" });
     });
@@ -81,7 +76,7 @@ module.exports.login = (req, res) => {
       .send({ message: "Email and password are required" });
   }
 
-  User.findOne({ email })
+  return User.findOne({ email })
     .select("+password")
     .then((user) => {
       if (!user) {
@@ -89,6 +84,7 @@ module.exports.login = (req, res) => {
           .status(UNAUTHORIZED)
           .send({ message: "Incorrect email or password" });
       }
+
       return bcrypt.compare(password, user.password).then((matched) => {
         if (!matched) {
           return res
@@ -100,14 +96,14 @@ module.exports.login = (req, res) => {
           expiresIn: "7d",
         });
 
-        res.send({ token });
+        return res.send({ token });
       });
     })
-    .catch(() => {
+    .catch(() =>
       res
         .status(INTERNAL_SERVER_ERROR)
-        .send({ message: "An error occurred on the server" });
-    });
+        .send({ message: "An error occurred on the server" })
+    );
 };
 
 module.exports.getCurrentUser = (req, res) => {
@@ -117,23 +113,23 @@ module.exports.getCurrentUser = (req, res) => {
       .send({ message: "Unauthorized: User not found" });
   }
 
-  User.findById(req.user._id)
+  return User.findById(req.user._id)
     .orFail(() => {
       throw new Error("User not found");
     })
-    .then((user) => {
+    .then((user) =>
       res.status(200).send({
         _id: user._id,
         name: user.name,
         avatar: user.avatar,
         email: user.email,
-      });
-    })
+      })
+    )
     .catch((err) => {
       if (err.name === "CastError") {
         return res.status(BAD_REQUEST).send({ message: "Invalid ID format" });
       }
-      res
+      return res
         .status(INTERNAL_SERVER_ERROR)
         .send({ message: "An error occurred on the server" });
     });
@@ -148,7 +144,7 @@ module.exports.updateUser = (req, res) => {
       .send({ message: "Name and avatar are required" });
   }
 
-  User.findByIdAndUpdate(
+  return User.findByIdAndUpdate(
     req.user._id,
     { name, avatar },
     { new: true, runValidators: true }
@@ -156,18 +152,18 @@ module.exports.updateUser = (req, res) => {
     .orFail(() => {
       throw new Error("User not found");
     })
-    .then((updatedUser) => {
+    .then((updatedUser) =>
       res.status(200).send({
         _id: updatedUser._id,
         name: updatedUser.name,
         avatar: updatedUser.avatar,
-      });
-    })
+      })
+    )
     .catch((err) => {
       if (err.name === "ValidationError") {
         return res.status(BAD_REQUEST).send({ message: "Invalid user data" });
       }
-      res
+      return res
         .status(INTERNAL_SERVER_ERROR)
         .send({ message: "An error occurred on the server" });
     });

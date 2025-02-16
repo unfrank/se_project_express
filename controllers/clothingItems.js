@@ -7,17 +7,14 @@ const {
   INTERNAL_SERVER_ERROR,
 } = require("../utils/errors");
 
-module.exports.getClothingItems = (req, res) => {
-  return ClothingItem.find({})
-    .then((items) => {
-      return res.send(items);
-    })
-    .catch(() => {
-      return res
+module.exports.getClothingItems = (req, res) =>
+  ClothingItem.find({})
+    .then((items) => res.send(items))
+    .catch(() =>
+      res
         .status(INTERNAL_SERVER_ERROR)
-        .send({ message: "An error has occurred on the server" });
-    });
-};
+        .send({ message: "An error has occurred on the server" })
+    );
 
 module.exports.getClothingItem = (req, res) => {
   const { itemId } = req.params;
@@ -28,9 +25,7 @@ module.exports.getClothingItem = (req, res) => {
       error.statusCode = NOT_FOUND;
       throw error;
     })
-    .then((item) => {
-      return res.send(item);
-    })
+    .then((item) => res.send(item))
     .catch((err) => {
       if (err.name === "CastError") {
         return res.status(BAD_REQUEST).send({ message: "Invalid ID format" });
@@ -65,11 +60,8 @@ module.exports.createClothingItem = (req, res) => {
   }
 
   return ClothingItem.create({ name, weather, imageUrl, owner })
-    .then((item) => {
-      return res.status(201).send(item);
-    })
+    .then((item) => res.status(201).send(item))
     .catch((err) => {
-      console.error("Error creating item:", err);
       if (err.name === "ValidationError") {
         return res.status(BAD_REQUEST).send({ message: "Invalid data" });
       }
@@ -97,12 +89,7 @@ module.exports.deleteClothingItem = (req, res) => {
 
       return ClothingItem.findByIdAndDelete(itemId);
     })
-    .then((deletedItem) => {
-      if (!deletedItem) {
-        return res.status(NOT_FOUND).send({ message: "Item not found" });
-      }
-      return res.status(200).send({ message: "Item deleted successfully" });
-    })
+    .then(() => res.status(200).send({ message: "Item deleted successfully" }))
     .catch((err) => {
       if (err.statusCode === NOT_FOUND) {
         return res.status(NOT_FOUND).send({ message: err.message });
@@ -142,7 +129,6 @@ module.exports.likeItem = (req, res) => {
       return res.send(updatedItem);
     })
     .catch((err) => {
-      console.error("Error liking item:", err);
       if (err.name === "CastError") {
         return res
           .status(BAD_REQUEST)
@@ -181,7 +167,6 @@ module.exports.dislikeItem = (req, res) => {
       return res.send(updatedItem);
     })
     .catch((err) => {
-      console.error("Error unliking item:", err);
       if (err.name === "CastError") {
         return res
           .status(BAD_REQUEST)
