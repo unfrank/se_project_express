@@ -7,6 +7,7 @@ const {
   UNAUTHORIZED,
   INTERNAL_SERVER_ERROR,
   CONFLICT,
+  NOT_FOUND,
 } = require("../utils/errors");
 const { JWT_SECRET } = require("../utils/config");
 
@@ -100,10 +101,12 @@ module.exports.login = (req, res) => {
     );
 };
 
-module.exports.getCurrentUser = (req, res) => {
-  return User.findById(req.user._id)
+module.exports.getCurrentUser = (req, res) =>
+  User.findById(req.user._id)
     .orFail(() => {
-      throw new Error("User not found");
+      const error = new Error("User not found");
+      error.statusCode = NOT_FOUND;
+      throw error;
     })
     .then((user) =>
       res.status(200).send({
@@ -114,7 +117,7 @@ module.exports.getCurrentUser = (req, res) => {
       })
     )
     .catch((err) => {
-      if (err.message === "User not found") {
+      if (err.statusCode === NOT_FOUND) {
         return res.status(NOT_FOUND).send({ message: "User not found" });
       }
       if (err.name === "CastError") {
@@ -124,7 +127,6 @@ module.exports.getCurrentUser = (req, res) => {
         .status(INTERNAL_SERVER_ERROR)
         .send({ message: "An error occurred on the server" });
     });
-};
 
 module.exports.updateUser = (req, res) => {
   const { name, avatar } = req.body;
@@ -141,7 +143,9 @@ module.exports.updateUser = (req, res) => {
     { new: true, runValidators: true }
   )
     .orFail(() => {
-      throw new Error("User not found");
+      const error = new Error("User not found");
+      error.statusCode = NOT_FOUND;
+      throw error;
     })
     .then((updatedUser) =>
       res.status(200).send({
@@ -151,7 +155,7 @@ module.exports.updateUser = (req, res) => {
       })
     )
     .catch((err) => {
-      if (err.message === "User not found") {
+      if (err.statusCode === NOT_FOUND) {
         return res.status(NOT_FOUND).send({ message: "User not found" });
       }
       if (err.name === "ValidationError") {

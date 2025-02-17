@@ -71,14 +71,17 @@ module.exports.deleteClothingItem = (req, res) => {
 
   return ClothingItem.findById(itemId)
     .orFail(() => {
-      throw { statusCode: NOT_FOUND, message: "Item not found" };
+      const error = new Error("Item not found");
+      error.statusCode = NOT_FOUND;
+      throw error;
     })
     .then((item) => {
       if (!item.owner.equals(req.user._id)) {
-        throw {
-          statusCode: FORBIDDEN,
-          message: "You are not authorized to delete this item",
-        };
+        const error = new Error(
+          "You do not have authorization to delete this item"
+        );
+        error.statusCode = FORBIDDEN;
+        throw error;
       }
       return ClothingItem.findByIdAndDelete(itemId);
     })
@@ -87,16 +90,14 @@ module.exports.deleteClothingItem = (req, res) => {
       if (res.headersSent) return;
 
       if (err.statusCode) {
-        return res.status(err.statusCode).send({ message: err.message });
+        res.status(err.statusCode).send({ message: err.message });
+      } else if (err.name === "CastError") {
+        res.status(BAD_REQUEST).send({ message: "Invalid item ID format" });
+      } else {
+        res
+          .status(INTERNAL_SERVER_ERROR)
+          .send({ message: "An internal server error occurred" });
       }
-      if (err.name === "CastError") {
-        return res
-          .status(BAD_REQUEST)
-          .send({ message: "Invalid item ID format" });
-      }
-      return res
-        .status(INTERNAL_SERVER_ERROR)
-        .send({ message: "An internal server error occurred" });
     });
 };
 
@@ -118,23 +119,22 @@ module.exports.likeItem = (req, res) => {
       throw error;
     })
     .then((updatedItem) => {
-      if (!updatedItem) {
-        return res.status(NOT_FOUND).send({ message: "Item not found" });
+      if (updatedItem) {
+        res.send(updatedItem);
+      } else {
+        res.status(NOT_FOUND).send({ message: "Item not found" });
       }
-      return res.send(updatedItem);
     })
     .catch((err) => {
       if (err.name === "CastError") {
-        return res
-          .status(BAD_REQUEST)
-          .send({ message: "Invalid item ID format" });
+        res.status(BAD_REQUEST).send({ message: "Invalid item ID format" });
+      } else if (err.statusCode === NOT_FOUND) {
+        res.status(NOT_FOUND).send({ message: err.message });
+      } else {
+        res
+          .status(INTERNAL_SERVER_ERROR)
+          .send({ message: "An internal server error occurred" });
       }
-      if (err.statusCode === NOT_FOUND) {
-        return res.status(NOT_FOUND).send({ message: err.message });
-      }
-      return res
-        .status(INTERNAL_SERVER_ERROR)
-        .send({ message: "An internal server error occurred" });
     });
 };
 
@@ -156,22 +156,21 @@ module.exports.dislikeItem = (req, res) => {
       throw error;
     })
     .then((updatedItem) => {
-      if (!updatedItem) {
-        return res.status(NOT_FOUND).send({ message: "Item not found" });
+      if (updatedItem) {
+        res.send(updatedItem);
+      } else {
+        res.status(NOT_FOUND).send({ message: "Item not found" });
       }
-      return res.send(updatedItem);
     })
     .catch((err) => {
       if (err.name === "CastError") {
-        return res
-          .status(BAD_REQUEST)
-          .send({ message: "Invalid item ID format" });
+        res.status(BAD_REQUEST).send({ message: "Invalid item ID format" });
+      } else if (err.statusCode === NOT_FOUND) {
+        res.status(NOT_FOUND).send({ message: err.message });
+      } else {
+        res
+          .status(INTERNAL_SERVER_ERROR)
+          .send({ message: "An internal server error occurred" });
       }
-      if (err.statusCode === NOT_FOUND) {
-        return res.status(NOT_FOUND).send({ message: err.message });
-      }
-      return res
-        .status(INTERNAL_SERVER_ERROR)
-        .send({ message: "An internal server error occurred" });
     });
 };
