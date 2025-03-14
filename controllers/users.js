@@ -13,7 +13,7 @@ const validator = require("validator");
 
 module.exports.createUser = async (req, res) => {
   try {
-    const { name, avatar, email, password } = req.body;
+    const { name, avatar = "", email, password } = req.body;
 
     console.log("🟡 Received /signup request with:", {
       name,
@@ -22,14 +22,14 @@ module.exports.createUser = async (req, res) => {
       password: password ? "HIDDEN" : "MISSING",
     });
 
-    if (!name || !avatar || !email || !password) {
+    if (!name || !email || !password) {
       console.log("❌ Missing fields in signup");
       return res
         .status(BAD_REQUEST)
         .send({ message: "All fields are required" });
     }
 
-    if (!validator.isURL(avatar)) {
+    if (avatar && !validator.isURL(avatar)) {
       console.log("❌ Invalid avatar URL:", avatar);
       return res
         .status(BAD_REQUEST)
@@ -47,11 +47,9 @@ module.exports.createUser = async (req, res) => {
       return res.status(CONFLICT).send({ message: "User already exists" });
     }
 
-    // Hash the password
     const hashedPassword = await bcrypt.hash(password, 10);
     console.log("🟡 Password hashed, creating user...");
 
-    // Create the user
     const user = await User.create({
       name,
       avatar,
@@ -61,10 +59,8 @@ module.exports.createUser = async (req, res) => {
 
     console.log("✅ User successfully created:", user._id);
 
-    // 🔥 Generate JWT token
     const token = jwt.sign({ _id: user._id }, JWT_SECRET, { expiresIn: "7d" });
 
-    // ✅ Send both `user` and `token`
     res.status(201).send({
       user: {
         _id: user._id,
@@ -72,7 +68,7 @@ module.exports.createUser = async (req, res) => {
         avatar: user.avatar,
         email: user.email,
       },
-      token, // Include token in the response
+      token,
     });
   } catch (err) {
     console.error("❌ Unexpected error during signup:", err);
@@ -99,7 +95,6 @@ module.exports.login = async (req, res) => {
       expiresIn: "7d",
     });
 
-    // ✅ FIX: Return user data along with token
     res.send({ user, token });
   } catch (err) {
     res.status(INTERNAL_SERVER_ERROR).send({ message: "Server error" });
@@ -129,18 +124,19 @@ module.exports.getCurrentUser = async (req, res) => {
   }
 };
 
-/**
- * ✅ Update the logged-in user's profile
- */
 module.exports.updateUser = async (req, res) => {
   try {
-    const { name, avatar } = req.body;
+    const { name, avatar = "" } = req.body;
     console.log("🟡 Update request for user:", req.user._id);
 
-    if (!name || !avatar) {
+    if (!name) {
+      return res.status(BAD_REQUEST).send({ message: "Name is required" });
+    }
+
+    if (avatar && !validator.isURL(avatar)) {
       return res
         .status(BAD_REQUEST)
-        .send({ message: "Name and avatar are required" });
+        .send({ message: "Invalid avatar URL format" });
     }
 
     const updatedUser = await User.findByIdAndUpdate(

@@ -8,14 +8,15 @@ const userSchema = new mongoose.Schema({
     minlength: 2,
     maxlength: 30,
   },
-  avatar: {
-    type: String,
-    required: true,
-    validate: {
-      validator: (url) => validator.isURL(url),
-      message: "Invalid avatar URL format",
-    },
-  },
+  // avatar: {
+  //   type: String,
+  //   required: true,
+  //   validate: {
+  //     validator: (url) => validator.isURL(url),
+  //     message: "Invalid avatar URL format",
+  //   },
+  // },
+  avatar: { type: String, default: "" },
   email: {
     type: String,
     required: true,
