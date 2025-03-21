@@ -26,18 +26,17 @@ module.exports.getClothingItem = (req, res) => {
       error.statusCode = NOT_FOUND;
       throw error;
     })
-    .then((item) => res.send(item))
-    .catch((err) => {
-      if (err.name === "CastError") {
-        return res.status(BAD_REQUEST).send({ message: "Invalid ID format" });
-      }
-      if (err.statusCode === NOT_FOUND) {
-        return res.status(NOT_FOUND).send({ message: err.message });
-      }
-      return res
-        .status(INTERNAL_SERVER_ERROR)
-        .send({ message: "An error has occurred on the server" });
-    });
+    .then((item) => res.send(item))((err) => {
+    if (err.name === "CastError") {
+      return res.status(BAD_REQUEST).send({ message: "Invalid ID format" });
+    }
+    if (err.statusCode === NOT_FOUND) {
+      return res.status(NOT_FOUND).send({ message: err.message });
+    }
+    return res
+      .status(INTERNAL_SERVER_ERROR)
+      .send({ message: "An error has occurred on the server" });
+  });
 };
 
 module.exports.createClothingItem = (req, res) => {

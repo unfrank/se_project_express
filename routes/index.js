@@ -12,7 +12,6 @@ router.post("/signin", login);
 router.use("/items", clothingItemsRouter);
 router.use("/users", usersRouter);
 
-// 404 handler
 router.use((req, res) => {
   res.status(NOT_FOUND).send({ message: "Requested resource not found" });
 });
