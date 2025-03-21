@@ -5,4 +5,5 @@ module.exports = {
   INTERNAL_SERVER_ERROR: 500,
   CONFLICT: 409,
   FORBIDDEN: 403,
+  CREATED: 201,
 };

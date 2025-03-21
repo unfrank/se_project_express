@@ -11,7 +11,7 @@ module.exports = (req, res, next) => {
 
   try {
     req.user = jwt.verify(token, JWT_SECRET);
-    next();
+    return next();
   } catch (err) {
     return res.status(UNAUTHORIZED).send({ message: "Invalid token" });
   }

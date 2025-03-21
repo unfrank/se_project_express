@@ -21,7 +21,7 @@ app.use(express.json());
 
 app.use("/", routes);
 
-app.use((err, req, res, next) => {
+app.use((err, res) => {
   res.status(err.statusCode || INTERNAL_SERVER_ERROR).send({
     message: err.message || "Internal Server Error",
   });
