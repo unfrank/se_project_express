@@ -6,7 +6,9 @@ require("dotenv").config();
 const routes = require("./routes");
 const { INTERNAL_SERVER_ERROR } = require("./utils/errors");
 
-const { PORT = 3001, MONGODB_URI } = process.env;
+const { PORT = 3001 } = process.env;
+const MONGODB_URI =
+  process.env.MONGODB_URI || "mongodb://localhost:27017/wtwr_db";
 
 if (!MONGODB_URI) {
   process.exit(1);
