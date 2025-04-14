@@ -1,10 +1,13 @@
+require("dotenv").config();
 const express = require("express");
 const mongoose = require("mongoose");
 const cors = require("cors");
-require("dotenv").config();
+const { errors } = require("celebrate");
 
 const routes = require("./routes");
-const { INTERNAL_SERVER_ERROR } = require("./utils/errors");
+
+const { requestLogger, errorLogger } = require("./middlewares/logger");
+const errorHandler = require("./middlewares/error-handler");
 
 const { PORT = 3001 } = process.env;
 const MONGODB_URI =
@@ -19,14 +22,16 @@ const app = express();
 mongoose.connect(MONGODB_URI).catch(() => process.exit(1));
 
 app.use(cors());
+
 app.use(express.json());
+
+app.use(requestLogger);
 
 app.use("/", routes);
 
-app.use((err, res) => {
-  res.status(err.statusCode || INTERNAL_SERVER_ERROR).send({
-    message: err.message || "Internal Server Error",
-  });
-});
+app.use(errorLogger);
+
+app.use(errors());
+app.use(errorHandler);
 
 app.listen(PORT);
