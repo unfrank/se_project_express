@@ -11,6 +11,7 @@ const {
   CREATED,
 } = require("../utils/errors");
 const { JWT_SECRET } = require("../utils/config");
+const token = jwt.sign({ _id: user._id }, JWT_SECRET);
 
 const {
   BadRequestError,
