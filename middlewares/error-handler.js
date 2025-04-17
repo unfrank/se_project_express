@@ -1,7 +1,7 @@
-const { BadRequestError, NotFoundError } = require("../errors/custom-errors");
+const { errorLogger } = require("./logger");
 
 module.exports = (err, req, res, next) => {
-  console.error(err);
+  errorLogger.error(err);
 
   const { statusCode = 500, message } = err;
 
