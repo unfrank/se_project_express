@@ -1,19 +1,11 @@
 const validator = require("validator");
 const mongoose = require("mongoose");
 const ClothingItem = require("../models/clothingItem");
-// const {
-//   BAD_REQUEST,
-//   NOT_FOUND,
-//   FORBIDDEN,
-//   INTERNAL_SERVER_ERROR,
-// } = require("../utils/errors");
 
 const {
   BadRequestError,
-  // UnauthorizedError,
   ForbiddenError,
   NotFoundError,
-  // ConflictError,
 } = require("../errors/custom-errors");
 
 module.exports.getClothingItems = (req, res, next) =>

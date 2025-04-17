@@ -36,3 +36,8 @@ The WTWR backend is a Node.js and Express-based server. This application allows 
 - `DELETE /items/:itemId` - Delete a clothing item
 - `PUT /items/:itemId/likes` - Like a clothing item
 - `DELETE /items/:itemId/likes` - Unlike a clothing item
+
+## Deployed Application
+
+- **Frontend** - [https://unfrank.crabdance.com](https://unfrank.crabdance.com)
+- **Backend API** - [https://api.unfrank.crabdance.com](https://api.unfrank.crabdance.com)

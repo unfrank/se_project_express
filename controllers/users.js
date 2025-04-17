@@ -2,21 +2,12 @@ const validator = require("validator");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const User = require("../models/user");
-const {
-  // BAD_REQUEST,
-  // UNAUTHORIZED,
-  // INTERNAL_SERVER_ERROR,
-  // CONFLICT,
-  // NOT_FOUND,
-  CREATED,
-} = require("../utils/errors");
+const { CREATED } = require("../utils/errors");
 const { JWT_SECRET } = require("../utils/config");
-const token = jwt.sign({ _id: user._id }, JWT_SECRET);
 
 const {
   BadRequestError,
   UnauthorizedError,
-  // ForbiddenError,
   NotFoundError,
   ConflictError,
 } = require("../errors/custom-errors");
