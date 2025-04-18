@@ -26,9 +26,20 @@ const app = express();
 mongoose.connect(MONGODB_URI).catch(() => process.exit(1));
 
 app.use(helmet());
-app.use(cors());
+
+// app.use(cors());
+
+app.use(
+  cors({
+    origin: "https://unfrank.crabdance.com",
+    credentials: true,
+    methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
+    allowedHeaders: ["Content-Type", "Authorization"],
+  })
+);
 
 app.use(rateLimiter);
+
 app.use(express.json());
 
 app.use(requestLogger);
