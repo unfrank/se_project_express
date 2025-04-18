@@ -53,6 +53,28 @@ module.exports.createUser = async (req, res, next) => {
   }
 };
 
+//! orig
+// module.exports.login = async (req, res, next) => {
+//   try {
+//     const { email, password } = req.body;
+//     const user = await User.findOne({ email }).select("+password");
+//     if (!user) {
+//       return next(new UnauthorizedError("Incorrect email or password"));
+//     }
+
+//     const matched = await bcrypt.compare(password, user.password);
+//     if (!matched) {
+//       return next(new UnauthorizedError("Incorrect email or password"));
+//     }
+//     const token = jwt.sign({ _id: user._id.toString() }, JWT_SECRET, {
+//       expiresIn: "7d",
+//     });
+
+//     return res.send({ user, token });
+//   } catch (err) {
+//     return next(err);
+//   }
+// };
 module.exports.login = async (req, res, next) => {
   try {
     const { email, password } = req.body;
@@ -68,9 +90,12 @@ module.exports.login = async (req, res, next) => {
     const token = jwt.sign({ _id: user._id.toString() }, JWT_SECRET, {
       expiresIn: "7d",
     });
+    const { _id, name, avatar } = user;
 
-    // return res.send({ user, token });
-    return res.send({ user, token });
+    return res.send({
+      token,
+      user: { _id, name, email, avatar },
+    });
   } catch (err) {
     return next(err);
   }
