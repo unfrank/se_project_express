@@ -2,42 +2,51 @@
 
 ## Description
 
-The WTWR backend is a Node.js and Express-based server. This application allows users to like clothing items. The backend connects to a MongoDB database to store and retrieve user and clothing item data.
+The WTWR backend is a Node.js and Express-based API server. It handles authentication, user profiles, and clothing item management.
+For development, it uses a local MongoDB instance (`mongodb://localhost`).  
+In production, MongoDB is hosted and accessed from the deployed server via environment variables.
 
 ## Features
 
-- RESTful API for managing clothing items and users
-- CRUD operations for clothing items
-- MongoDB integration using Mongoose
-- Error handling
+- RESTful API for user accounts and clothing items
+- JWT authentication and authorization
+- Celebrate/Joi validation and centralized error handling
+- MongoDB with Mongoose ODM
+- Winston logging for requests and errors
+- Helmet & rate-limiting middleware for security
+- Deployed with PM2 and Nginx on GCP
 
 ## Technologies Used
 
-- **Node.js** - JavaScript runtime environment
-- **Express.js** - Web framework for building RESTful APIs
-- **MongoDB** - NoSQL database for storing user and clothing data
-- **Mongoose** - ODM (Object Data Modeling) for MongoDB
-- **ESLint & Prettier** - Code formatting and linting
-- **GitHub Actions** - CI/CD for automated testing
+- **Node.js** + **Express.js**
+- **MongoDB** + **Mongoose**
+- **Celebrate** + **Joi** + **Validator**
+- **Winston** + **express-winston**
+- **Helmet** + **express-rate-limit**
+- **JWT** for authentication
 
 ## API Endpoints
 
-### User
+### Authentication
 
-- `GET /users` - Get all users
-- `GET /users/:userId` - Get a specific user
-- `POST /users` - Create a new user
+- `POST /signup` – Register new user
+- `POST /signin` – Login and receive token
+
+### Users
+
+- `GET /users/me` – Get current user profile
+- `PATCH /users/me` – Update current user's name and avatar
 
 ### Clothing Items
 
-- `GET /items` - Get all clothing items
-- `GET /items/:itemId` - Get a specific clothing item
-- `POST /items` - Create a new clothing item
-- `DELETE /items/:itemId` - Delete a clothing item
-- `PUT /items/:itemId/likes` - Like a clothing item
-- `DELETE /items/:itemId/likes` - Unlike a clothing item
+- `GET /items` – Get all clothing items
+- `GET /items/:itemId` – Get a specific clothing item
+- `POST /items` – Create a new clothing item
+- `DELETE /items/:itemId` – Delete a clothing item (if owner)
+- `PUT /items/:itemId/likes` – Like an item
+- `DELETE /items/:itemId/likes` – Unlike an item
 
 ## Deployed Application
 
-- **Frontend** - [https://unfrank.crabdance.com](https://unfrank.crabdance.com)
-- **Backend API** - [https://api.unfrank.crabdance.com](https://api.unfrank.crabdance.com)
+- **Frontend:** [https://unfrank.crabdance.com](https://unfrank.crabdance.com)
+- **Backend API:** [https://api.unfrank.crabdance.com](https://api.unfrank.crabdance.com)

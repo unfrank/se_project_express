@@ -10,7 +10,7 @@ const {
   UnauthorizedError,
   NotFoundError,
   ConflictError,
-} = require("../errors/custom-errors");
+} = require("../errors");
 
 module.exports.createUser = async (req, res, next) => {
   try {
@@ -69,7 +69,7 @@ module.exports.login = async (req, res, next) => {
       expiresIn: "7d",
     });
 
-    return res.send({ user, token });
+    return res.send({ token });
   } catch (err) {
     return next(err);
   }
