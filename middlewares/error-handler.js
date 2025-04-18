@@ -1,8 +1,6 @@
 const { errorLogger } = require("./logger");
 
 module.exports = (err, req, res, next) => {
-  errorLogger.error(err);
-
   const { statusCode = 500, message } = err;
 
   res.status(statusCode).send({
