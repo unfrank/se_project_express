@@ -27,6 +27,9 @@ mongoose.connect(MONGODB_URI).catch(() => process.exit(1));
 
 app.use(helmet());
 
+app.options("*", cors());
+
+app.use("/", routes);
 // app.use(cors());
 
 app.use(
@@ -43,8 +46,6 @@ app.use(rateLimiter);
 app.use(express.json());
 
 app.use(requestLogger);
-
-app.use("/", routes);
 
 app.use(errorLogger);
 
