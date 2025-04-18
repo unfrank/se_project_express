@@ -94,7 +94,7 @@ module.exports.login = async (req, res, next) => {
 
     return res.send({
       token,
-      user: { _id, name, email, avatar },
+      user: { _id, name, avatar },
     });
   } catch (err) {
     return next(err);
