@@ -1,5 +1,3 @@
-console.log("RUNNING FROM:", __filename);
-
 require("dotenv").config();
 const express = require("express");
 const helmet = require("helmet");
